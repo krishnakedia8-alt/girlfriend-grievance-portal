@@ -3,17 +3,19 @@ from flask_mail import Mail, Message
 import sqlite3
 import os
 from functools import wraps
-from dotenv import load_dotenv, find_dotenv
+from dotenv import load_dotenv
 from pathlib import Path
 
-# Load environment variables
+# Load .env only for local runs, never override Render env
 env_path = Path('.') / '.env'
-load_dotenv(dotenv_path=env_path, override=True)
+RUNNING_ON_RENDER = bool(os.environ.get('PORT')) or bool(os.environ.get('RENDER'))
+if not RUNNING_ON_RENDER and env_path.exists():
+    load_dotenv(dotenv_path=env_path, override=False)
 
 app = Flask(__name__)
 app.secret_key = 'supersecretkey'
 
-# Gmail SMTP configuration
+# Gmail SMTP
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
@@ -23,7 +25,7 @@ app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('EMAIL_DEFAULT_SENDER')
 
 mail = Mail(app)
 
-# Environment variables
+# Auth and portal config from environment
 USER_NAME = os.environ.get('USER_NAME')
 USER_PASSWORD = os.environ.get('USER_PASSWORD')
 ADMIN_NAME = os.environ.get('ADMIN_NAME')
@@ -31,7 +33,6 @@ ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD')
 PORTAL_URL = os.environ.get('PORTAL_URL')
 
 def init_db():
-    """Initializes the grievances database if not present."""
     with sqlite3.connect('grievances.db') as conn:
         c = conn.cursor()
         c.execute('''
@@ -47,8 +48,15 @@ def init_db():
         ''')
         conn.commit()
 
+# Ensure DB exists on first import, works under gunicorn too
+try:
+    if not os.path.exists('grievances.db'):
+        init_db()
+        print('Database created on import.')
+except Exception as e:
+    print('Database init on import failed:', e)
+
 def login_required(role):
-    """Decorator to restrict routes to logged-in users of specific role."""
     def wrapper(fn):
         @wraps(fn)
         def decorated_view(*args, **kwargs):
@@ -67,6 +75,10 @@ def login():
     if request.method == 'POST':
         user = request.form['username']
         pw = request.form['password']
+
+        # simple debug to logs, verifies which names are active in env
+        print('Login attempt for:', user, '| Env USER_NAME:', USER_NAME, '| Env ADMIN_NAME:', ADMIN_NAME)
+
         if user == USER_NAME and pw == USER_PASSWORD:
             session['user'] = USER_NAME
             return redirect(url_for('submit'))
@@ -93,15 +105,18 @@ def submit():
 
         with sqlite3.connect('grievances.db') as conn:
             c = conn.cursor()
-            c.execute("INSERT INTO grievances (title, description, mood, priority) VALUES (?, ?, ?, ?)",
-                      (title, desc, mood, priority))
+            c.execute(
+                "INSERT INTO grievances (title, description, mood, priority) VALUES (?, ?, ?, ?)",
+                (title, desc, mood, priority)
+            )
             conn.commit()
             grievance_id = c.lastrowid
 
-        # Email notification to admin
-        msg = Message(f"New Grievance from {USER_NAME} 💌",
-                      sender=app.config['MAIL_DEFAULT_SENDER'],
-                      recipients=[os.environ.get('EMAIL_ADMIN')])
+        msg = Message(
+            f"New Grievance from {USER_NAME} 💌",
+            sender=app.config['MAIL_DEFAULT_SENDER'],
+            recipients=[os.environ.get('EMAIL_ADMIN')]
+        )
         msg.html = f"""
             <h3>New Grievance Submitted 💌</h3>
             <p><strong>Title:</strong> {title}</p>
@@ -110,7 +125,7 @@ def submit():
             <p><strong>Description:</strong><br>{desc}</p>
             <hr>
             <p>Click below to respond:</p>
-            <a href="{PORTAL_URL}/login" 
+            <a href="{PORTAL_URL}/login"
                style="padding:10px;background-color:pink;border:none;border-radius:5px;text-decoration:none;">
                Respond 💌
             </a>
@@ -118,7 +133,7 @@ def submit():
         try:
             mail.send(msg)
         except Exception as e:
-            print(f"Email send failed: {e}")
+            print("Email send failed:", e)
 
         flash(f'Grievance submitted! {ADMIN_NAME} has been notified 💌')
         return redirect(url_for('thank_you'))
@@ -126,40 +141,43 @@ def submit():
     return render_template('submit.html')
 
 def send_email_to_user(grievance_id, response):
-    """Sends response email to user."""
     with sqlite3.connect('grievances.db') as conn:
         c = conn.cursor()
         c.execute("SELECT title, priority, resolved FROM grievances WHERE id = ?", (grievance_id,))
         result = c.fetchone()
 
-    if result:
-        title, priority, resolved = result
-        status = "Resolved ✅" if resolved == 1 else "Pending ❌"
+    if not result:
+        return
 
-        msg = Message(f"Grievance Response Received - Re: {title}",
-                      recipients=[os.environ.get('EMAIL_USER_RECEIVER')])
-        msg.html = f"""
-        <html>
-            <body style="font-family: Arial, sans-serif; background-color: #f9f9f9;">
-                <div style="background-color:#fff;padding:20px;border-radius:8px;width:600px;margin:auto;">
-                    <h2 style="color:#4CAF50;">Grievance Response Received</h2>
-                    <p><strong>Title:</strong> {title}</p>
-                    <p><strong>Priority:</strong> {priority}</p>
-                    <p><strong>Status:</strong> {status}</p>
-                    <hr>
-                    <p><strong>Response:</strong></p>
-                    <blockquote style="background-color:#f4f4f4;padding:10px;border-left:4px solid #4CAF50;">
-                        {response}
-                    </blockquote>
-                    <p style="color:#888;font-size:12px;">This is an automated message from your grievance portal.</p>
-                </div>
-            </body>
-        </html>
-        """
-        try:
-            mail.send(msg)
-        except Exception as e:
-            print(f"Error sending response email: {e}")
+    title, priority, resolved = result
+    status = "Resolved ✅" if resolved == 1 else "Pending ❌"
+
+    msg = Message(
+        f"Grievance Response Received - Re: {title}",
+        recipients=[os.environ.get('EMAIL_USER_RECEIVER')]
+    )
+    msg.html = f"""
+    <html>
+      <body style="font-family: Arial, sans-serif; background-color: #f9f9f9;">
+        <div style="background-color:#fff;padding:20px;border-radius:8px;width:600px;margin:auto;">
+          <h2 style="color:#4CAF50;">Grievance Response Received</h2>
+          <p><strong>Title:</strong> {title}</p>
+          <p><strong>Priority:</strong> {priority}</p>
+          <p><strong>Status:</strong> {status}</p>
+          <hr>
+          <p><strong>Response:</strong></p>
+          <blockquote style="background-color:#f4f4f4;padding:10px;border-left:4px solid #4CAF50;">
+            {response}
+          </blockquote>
+          <p style="color:#888;font-size:12px;">This is an automated message from your grievance portal.</p>
+        </div>
+      </body>
+    </html>
+    """
+    try:
+        mail.send(msg)
+    except Exception as e:
+        print("Error sending response email:", e)
 
 @app.route('/thankyou')
 @login_required(USER_NAME)
@@ -192,7 +210,6 @@ def respond(gid):
         c = conn.cursor()
         c.execute("UPDATE grievances SET response = ? WHERE id = ?", (response, gid))
         conn.commit()
-
     send_email_to_user(gid, response)
     return redirect(url_for('dashboard'))
 
@@ -208,7 +225,7 @@ def resolve(gid):
 if __name__ == '__main__':
     try:
         init_db()
-        print("✅ Database initialized successfully.")
+        print("Database ensured in __main__.")
     except Exception as e:
-        print("❌ Database initialization failed:", e)
+        print("Database init in __main__ failed:", e)
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
