@@ -208,10 +208,13 @@ def resolve(gid):
     return redirect(url_for('dashboard'))
 
 if __name__ == '__main__':
+    from app import init_db
+    print("Initializing database...")
     try:
-        from app import init_db
         init_db()
-    except:
-        pass
+        print("Database initialized successfully.")
+    except Exception as e:
+        print(f"Database initialization skipped or failed: {e}")
     app.run(host='0.0.0.0', port=5000)
+
 
