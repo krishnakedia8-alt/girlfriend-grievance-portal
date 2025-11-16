@@ -1,48 +1,40 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
-    <link rel="stylesheet" href="/static/css/style.css">
-</head>
-<body>
-    <div class="dashboard-container">
-        <div class="dashboard-box">
-            <h2>Grievances Dashboard</h2>
-            <div class="grievance-list">
-                {% for grievance in grievances %}
-                    <div class="grievance-item">
-                        <h3>{{ grievance[1] }}</h3>
-                        <p><strong>Description:</strong> {{ grievance[2] }}</p>
-                        <p><strong>Mood:</strong> {{ grievance[3] }}</p>
-                        <p><strong>Priority:</strong> {{ grievance[4] }}</p>
-                        <p><strong>Status:</strong> {% if grievance[5] == 1 %} ✅ Resolved {% else %} ❌ Pending {% endif %}</p>
-                        <p><strong>Response:</strong> {{ grievance[4] or 'None yet' }}</p>
-            
-                        {% if not grievance[6] %}
-                            <form method="POST" action="{{ url_for('respond', gid=grievance[0]) }}">
-                                <textarea name="response" placeholder="Type your response here..." rows="3" required></textarea>
-                                <button type="submit">Submit Response</button>
-                            </form>
-                        {% else %}
-                            <p style="color: green;"><strong>✅ You have already responded.</strong></p>
-                        {% endif %}
-            
-                        {% if grievance[5] == 1 %}
-                            <button style="background-color: #28a745; color: white;" disabled>Resolved</button>
-                        {% else %}
-                            <a href="{{ url_for('resolve', gid=grievance[0]) }}">
-                                <button>Resolve</button>
-                            </a>
-                        {% endif %}
-                    </div>
-                {% endfor %}
-            </div>            
-            <div style="text-align: center; margin-top: 20px;">
-                <a href="/view_grievances_admin" class="btn">View All Grievances</a>
-            </div>
-        </div>
-    </div>
-</body>
-</html>
+{% extends "base.html" %}
+{% block content %}
+<h2>Admin dashboard</h2>
+
+<div class="cards">
+  <div class="stat">
+    <div class="stat-num">{{ total }}</div>
+    <div class="stat-label">Total</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num">{{ resolved }}</div>
+    <div class="stat-label">Resolved</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num">{{ total - resolved }}</div>
+    <div class="stat-label">Open</div>
+  </div>
+</div>
+
+<div class="cards">
+  <div class="card">
+    <h3>Moods</h3>
+    <ul class="pill-list">
+      {% for k,v in mood_counts.items() %}
+        <li class="pill">{{ k }} {{ v }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+  <div class="card">
+    <h3>Priority</h3>
+    <ul class="pill-list">
+      {% for k,v in prio_counts.items() %}
+        <li class="pill">{{ k }} {{ v }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>
+
+<a class="btn" href="{{ url_for('view_all_grievances') }}">View all grievances</a>
+{% endblock %}
