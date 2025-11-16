@@ -1,360 +1,66 @@
-/* Make the background image fill the screen */
-body, html {
-    height: 100%;
-    margin: 0;
-    font-family: Arial, sans-serif;
+:root{
+  --pink:#ffc1dc;
+  --hot:#ff5fa2;
+  --cream:#fff7fb;
+  --ink:#2b2b2b;
+  --muted:#777;
+  --card:#ffffffcc;
 }
 
-input, textarea, select, button {
-    width: 100%;
-    max-width: 100%;
-    font-size: 1rem;
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,system-ui,Arial,sans-serif;color:var(--ink);background:var(--cream)}
+.pink-bg{
+  background:
+    radial-gradient(1200px 600px at -10% -10%, var(--pink), transparent 60%),
+    radial-gradient(1000px 500px at 110% 0%, #ffd6e9, transparent 60%),
+    var(--cream);
 }
 
-.button-group {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin-top: 15px;
+.container{max-width:960px;margin:40px auto;padding:0 16px}
+.topbar{
+  position:sticky;top:0;background:rgba(255,255,255,.7);backdrop-filter:blur(8px);
+  border-bottom:1px solid #ffe3ef;display:flex;justify-content:space-between;align-items:center;
+  padding:10px 16px
 }
+.brand{font-weight:800;color:var(--hot)}
+.navlinks a{margin-left:12px;color:var(--ink);text-decoration:none}
+.navlinks a:hover{color:var(--hot)}
 
-@media (min-width: 480px) {
-    .button-group {
-        flex-direction: row;
-        justify-content: center;
-    }
+.hero{padding:60px 0;text-align:center}
+.hero h1{font-size:40px;margin:0 0 10px;color:var(--hot)}
+.hero p{color:var(--muted);margin-bottom:20px}
+
+.btn{
+  display:inline-block;background:linear-gradient(135deg, var(--hot), #ffa6c9);
+  color:#fff;border:none;border-radius:10px;padding:10px 16px;text-decoration:none;cursor:pointer
 }
+.btn.ghost{background:#fff;color:var(--hot);border:1px solid #ffd1e6}
+.btn.small{padding:6px 10px;border-radius:8px}
 
-.login-container {
-    background-image: url('/static/images/login_image.webp'); /* Update with the desired background image */
-    background-size: cover;
-    background-position: center;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100%;
-    text-align: center;
-    padding-top: 300px;
+.flash{background:#ffe5f0;border:1px solid #ffc1dc;color:#6b2141;padding:10px 12px;border-radius:10px;margin:16px 0}
+
+.card{background:var(--card);border:1px solid #ffe1ee;border-radius:16px;padding:16px;margin:16px 0}
+.card.center{text-align:center}
+
+label{display:block;margin-top:10px;font-weight:600}
+input, select, textarea{
+  width:100%;padding:10px;border:1px solid #ffd1e6;border-radius:10px;background:#fff
 }
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 
-/* Box styling for login box */
-.login-box {
-    background: rgba(254, 176, 192, 1);
-    padding: 25px;
-    border-radius: 25px;
-    height: auto;
-    width: 90%;
-    max-width: 350px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
+.table{width:100%;border-collapse:collapse;background:#fff;border-radius:12px;overflow:hidden}
+.table th,.table td{padding:10px;border-bottom:1px solid #f5cfe0;text-align:left}
+.table th{background:#ffe8f3}
 
-.login-box h2 {
-    margin-bottom: 20px;
-    color: #333;
-}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin:16px 0}
+.stat{background:var(--card);border:1px solid #ffe1ee;border-radius:16px;padding:16px;text-align:center}
+.stat-num{font-size:32px;font-weight:800;color:var(--hot)}
+.stat-label{color:var(--muted)}
 
-.login-box input {
-    width: 100%;
-    padding: 14px 16px;
-    margin: 10px 0;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    box-sizing: border-box;
-    font-size: 16px;
-}
+.pill-list{list-style:none;padding:0;margin:0;display:flex;flex-wrap:wrap;gap:8px}
+.pill{background:#fff;border:1px solid #ffd1e6;border-radius:999px;padding:6px 10px}
 
-.login-box button {
-    width: 100%;
-    padding: 10px;
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    box-sizing: border-box;
-}
+.filters{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+.inline{display:inline-flex;gap:6px;align-items:center}
 
-.login-box button:hover {
-    background-color: #45a049;
-}
-
-/* Container for the submit page */
-.submit-container {
-    background-image: url('/static/images/submit_image.webp'); /* Update with the desired background image */
-    background-size: cover;
-    background-position: 45% center;
-    background-repeat: no-repeat;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    min-height: 100vh;
-    padding-top: 200px;
-    text-align: center;
-}
-
-/* Box styling for submit form */
-.submit-box {
-    position: absolute;
-    top: 67%;
-    left: 50.5%; 
-    transform: translate(-50%, -50%); /* This will center the box */
-    background: rgba(254, 220, 230, 0.8);
-    padding: 15px 20px;
-    border-radius: 25px;
-    width: 70%;
-    max-width: 400px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.submit-box h2 {
-    margin-bottom: 20px;
-    color: #333;
-}
-
-/* Reuse input styles */
-.submit-box input,
-.submit-box select,
-.submit-box textarea {
-    width: 100%;
-    padding: 14px 16px;
-    margin: 10px 0;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    font-size: 15px;
-    box-sizing: border-box;
-    background-color: #fff0f5;
-}
-
-/* Style the submit button */
-.submit-box button {
-    width: 100%;
-    padding: 14px;
-    background-color: #FF69B4;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 16px;
-    transition: background-color 0.3s ease;
-}
-
-.submit-box button:hover {
-    background-color: #ff4892;
-}
-
-/* Container for the dashboard page */
-.dashboard-container {
-    background-image: url('/static/images/dashboard_image.webp'); /* Update with the desired background image */
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    min-height: 100vh;
-    padding-top: 200px;  /* Adjust padding to position the box as per preference */
-    text-align: center;
-}
-
-/* Box styling for the dashboard content */
-.dashboard-box {
-    background: rgba(254, 220, 230, 1);
-    padding: 30px;
-    border-radius: 25px;
-    width: 450px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-/* Dashboard heading */
-.dashboard-box h2 {
-    margin-bottom: 20px;
-    color: #333;
-}
-
-/* Styling for the list of grievances or any other content */
-.grievance-list {
-    width: 100%;
-    padding: 10px;
-    margin: 10px 0;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    background-color: #fff0f5;
-    font-size: 14px;
-    box-sizing: border-box;
-    text-align: left;
-}
-
-/* Style for each grievance item */
-.grievance-item {
-    background-color: #fff;
-    padding: 10px;
-    margin: 5px 0;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    font-size: 14px;
-}
-
-.grievance-item span {
-    color: #FF69B4;
-}
-
-.grievance-item button {
-    padding: 10px;
-    background-color: #FF69B4;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 14px;
-    margin-top: 10px;
-    transition: background-color 0.3s ease;
-}
-
-.grievance-item button:hover {
-    background-color: #ff4892;
-}
-
-/* Container for the home page */
-.home-container {
-    background-image: url('/static/images/home_image.webp'); /* Update with your desired background image */
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    min-height: 100vh;
-    padding-top: 200px;  /* Adjust padding to position the box as per preference */
-    text-align: center;
-}
-
-/* Box styling for the home page content */
-.home-box {
-    position: absolute;
-    top: 15%;
-    background: rgb(224, 93, 132, 0.9);
-    padding: 30px;
-    border-radius: 25px;
-    width: 70%;
-    max-width: 450px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-/* Heading for home page */
-.home-box h2 {
-    margin-bottom: 20px;
-    color: #333;
-}
-
-/* Home page description or any other content */
-.home-box p {
-    font-size: 18px;
-    color: #333;
-    margin: 10px 0;
-}
-
-/* Button to navigate to submit page or login */
-.home-box a {
-    width: 100%;
-    text-decoration: none;
-}
-
-.home-box button {
-    width: 100%;
-    padding: 14px;
-    background-color: #FF69B4;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 16px;
-    transition: background-color 0.3s ease;
-}
-
-.home-box button:hover {
-    background-color: #ff4892;
-}
-
-@media (max-width: 600px) {
-    .submit-box, .login-box, .dashboard-box {
-        padding: 20px 15px;
-    }
-
-    h2 {
-        font-size: 1.3rem;
-    }
-
-    button {
-        padding: 12px;
-        font-size: 1rem;
-    }
-}
-
-.thankyou-container {
-    background-image: url('/static/images/submit_image.webp'); /* Update with the desired background image */
-    background-size: cover;
-    background-position: 45% center;
-    background-repeat: no-repeat;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    min-height: 100vh;
-    padding-top: 200px;
-    text-align: center;
-}
-
-.thankyou-box {
-    position: absolute;
-    background: rgba(255, 240, 245, 0.8);
-    border-radius: 25px;
-    max-width: 400px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    top: 67%;
-    left: 50.5%; 
-    transform: translate(-50%, -50%); /* This will center the box */
-    padding: 15px 20px;
-    width: 70%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.thankyou-box h2 {
-    margin-bottom: 15px;
-    font-size: 24px;
-    color: #ff69b4;
-}
-
-.thankyou-box p {
-    font-size: 18px;
-    color: #444;
-    margin-bottom: 20px;
-}
-
-.thankyou-box .btn {
-    background-color: #ff69b4;
-    color: white;
-    padding: 12px 18px;
-    border: none;
-    border-radius: 8px;
-    text-decoration: none;
-    font-size: 16px;
-}
-.thankyou-box .btn:hover {
-    background-color: #ff4892;
-}
+.footer{text-align:center;color:var(--muted);font-size:14px;margin:40px 0}
