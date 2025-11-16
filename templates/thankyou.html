@@ -1,20 +1,8 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Thank You!</title>
-    <link rel="stylesheet" href="/static/css/style.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-</head>
-<body>
-    <div class="thankyou-container">
-        <div class="thankyou-box">
-            <h2>Thank you, {{ user_display_name }} 💖</h2>
-            <p>Your grievance has been sent to {{ admin_display_name }} 💌<br>He will get back to you very soon!</p>
-            <div class="button-group">
-                <a href="/submit" class="btn">➕ Submit Another</a>
-                <a href="/my_grievances" class="btn">📋 View My Grievances</a>
-            </div>
-        </div>
-    </div>
-</body>
-</html>
+{% extends "base.html" %}
+{% block content %}
+<div class="card center">
+  <h2>Thanks {{ user_display_name }} 💖</h2>
+  <p>{{ admin_display_name }} will read it and respond</p>
+  <a class="btn" href="{{ url_for('my_grievances') }}">View my grievances</a>
+</div>
+{% endblock %}
