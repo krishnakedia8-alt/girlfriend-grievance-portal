@@ -1,40 +1,32 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Submit Grievance</title>
-    <link rel="stylesheet" href="/static/css/style.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-</head>
-<body>
-    <div class="submit-container">
-        <div class="submit-box">
-            <h2>Submit a Grievance 🥀</h2>
-            <form method="POST">
-                <input type="text" name="title" placeholder="Title" required>
-                <textarea name="description" placeholder="What's bothering you?" required></textarea>
-                
-                <label for="mood">Mood:</label>
-                <select name="mood">
-                    <option>🤬</option>
-                    <option>😡</option>
-                    <option>😢</option>
-                    <option>🍆</option>
-                </select>
-
-                <label for="priority">Severity:</label>
-                <select name="priority">
-                    <option>A chunky kitkat would fix this 👺</option>
-                    <option>I hate you 👺👺</option>
-                    <option>We're breaking up 👺👺👺</option>
-                    <option>I am running away with another man 👺👺👺👺</option>
-                </select>
-
-                <button type="submit" class="btn">Submit 💌</button>
-            </form>
-            <div style="text-align: center; margin-top: 20px;">
-                <a href="/my_grievances" class="btn">View My Grievances</a>
-            </div>
-        </div>
+{% extends "base.html" %}
+{% block content %}
+<h2>Submit a grievance</h2>
+<form method="post" class="card">
+  <label>Title</label>
+  <input name="title" required>
+  <label>Description</label>
+  <textarea name="description" rows="5" required></textarea>
+  <div class="grid2">
+    <div>
+      <label>Mood</label>
+      <select name="mood">
+        <option>🙂</option>
+        <option>😐</option>
+        <option>😕</option>
+        <option>😢</option>
+        <option>😡</option>
+      </select>
     </div>
-</body>
-</html>
+    <div>
+      <label>Priority</label>
+      <select name="priority">
+        <option>Low</option>
+        <option selected>Medium</option>
+        <option>High</option>
+        <option>Critical</option>
+      </select>
+    </div>
+  </div>
+  <button class="btn">Send 💌</button>
+</form>
+{% endblock %}
